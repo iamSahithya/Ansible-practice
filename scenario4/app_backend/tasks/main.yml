@@ -1,0 +1,20 @@
+---
+- name: tasks
+  file:
+    path: /etc/myapp
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: secrets with roles
+  template: 
+    src: myapp.conf.j2
+    dest: /etc/myapp/config.json
+    owner: root
+    group: root
+    mode: '0644'
+  notify: show-config-changed
+- name: print msg
+  debug:
+    msg: "Rendered /etc/myapp/config.json for {{ inventory_hostname }}"

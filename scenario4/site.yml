@@ -1,0 +1,12 @@
+---
+- name: Deploy app_backend role with environment vault
+  hosts: all
+  become: true
+  gather_facts: false
+
+  vars_files:
+    - "inventory/{{ env }}/group_vars/vault.yml"
+
+  roles:
+    - app_backend
+

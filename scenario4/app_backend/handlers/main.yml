@@ -1,0 +1,5 @@
+---
+# handlers file for app_backen
+- name: show-config-changed
+  debug:
+    msg: "/etc/myapp/config.json changed on {{ inventory_hostname }}"
