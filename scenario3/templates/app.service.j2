@@ -1,0 +1,22 @@
+[Unit]
+Description={{ app_name }} service
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory={{ app_dir }}
+{% if app_lang == 'node' %}
+ExecStart=/usr/bin/node {{ app_dir }}/{{ (lookup('fileglob', app_dir + '/*.js') | basename) if false else (app_entry | default('index.js')) }}
+# If your app uses 'npm start' instead, set:
+# ExecStart=/usr/bin/npm start
+Restart=on-failure
+Environment=NODE_ENV=production
+{% elif app_lang == 'python' %}
+ExecStart={{ venv_path }}/bin/gunicorn -w 3 -b 127.0.0.1:{{ app_port }} {{ gunicorn_app | default('app:app') }}
+Restart=on-failure
+Environment=PYTHONUNBUFFERED=1
+{% endif %}
+
+[Install]
+WantedBy=multi-user.target
+
