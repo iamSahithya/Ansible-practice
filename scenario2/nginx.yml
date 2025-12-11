@@ -1,0 +1,41 @@
+---
+- name: Implementing Scenario2
+  hosts: all
+  become: yes
+  gather_facts: yes
+  vars: 
+    app_dirs: 
+      - opt/app
+      - opt/app/logs
+      - opt/app/data
+  tasks:
+    - name: Install nginx
+      package:
+        name: nginx
+        state: present
+      when: ansible_facts.os_family in ["RedHat","Debian"]
+      tags: install
+    - name: Create directory /opt/app
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+      loop: "{{ app_dirs }}"
+      tags: setup
+    - name: Implement the template
+      template:
+        src: nginx-app.conf.j2
+        dest: /etc/nginx/conf.d/nginx-app.conf
+        owner: root
+        group: root
+        mode: '0644'
+        backup: yes
+        validate: "nginx -t -c %s"
+      notify: restart nginx
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
